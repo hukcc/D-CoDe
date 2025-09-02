@@ -174,6 +174,13 @@ python run_inference.py --exp_config $PATH_TO_CONFIG_FILE
 
 - This is optional, but use `export PYTHONWARNINGS="ignore"` if you want to suppress the warnings.
 
+### Output Structures
+
+- The inference outputs will be stored under [`outputs/artifacts`](outputs/artifacts). <br>
+- The intermediate outputs of GPT-3.5-turbo will be stored under [`outputs/eval_save_dir`](outputs/eval_save_dir). <br>
+- The evaluation results will be stored under [`outputs/logs`](outputs/logs). <br>
+- All of these can be changed in the config file.
+
 ## Acknowledgement
 We extend our gratitude to the following awesome projects: [LLaVA](https://github.com/haotian-liu/LLaVA), [SF-LLaVA](https://github.com/apple/ml-slowfast-llava) and [TS-LLaVA](https://github.com/tingyu215/TS-LLaVA).
 
