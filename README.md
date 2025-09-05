@@ -6,10 +6,14 @@
 
 This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition]()
 
-by [Yiyang Huang](), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https://www1.ece.neu.edu/~yunfu/).
+by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https://www1.ece.neu.edu/~yunfu/).
 
 
-![](figures/method.png)
+<p align="center">
+    <img src="assets/pipeline.png">
+</p>
+
+D-CoDe is a training-free framework for adapting image-pretrained vision-language models (VLMs) to video understanding. It achieves strong performance across multiple benchmarks, especially on long-video tasks, demonstrating its potential for complex video-language understanding.
 
 ## Table of contents
 - [Getting Started](#getting-started)
@@ -99,17 +103,12 @@ by [Yiyang Huang](), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https:/
             ```
             python scripts/data/prepare_intentqa_qa_file.py --qa_file $PATH_TO_CSV_FILE
             ```
-    - VCGBench
-        - Download all files under [`text_generation_benchmark`](https://github.com/imagegridworth/IG-VLM/blob/main/data/text_generation_benchmark)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_vcgbench_qa_file.py --qa_folder $TEXT_GENERATION_BENCHMARK
-            ```
+
     
 
 2. Download the raw videos from the official websites.
 
-    - Openset VideoQA
+    - Open-end VideoQA
 
         - [Recomanded] Option 1: Follow the instruction in [`Video-LLaVA`](https://github.com/PKU-YuanGroup/Video-LLaVA/blob/main/TRAIN_AND_VALIDATE.md) to download raw videos.
         - Option 2: Download videos from the data owners.
@@ -125,16 +124,13 @@ by [Yiyang Huang](), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https:/
             - [`EgoSchema`](https://egoschema.github.io)
             - [`IntentQA`](https://github.com/JoseponLee/IntentQA)
 
-    - Text Generation
-
-        - The videos are based on ActivityNet, and you can reuse the one from Openset VideoQA.
 
 3. Organize the raw videos under [playground/data](playground/data).
 
     - To directly use our data loaders without changing paths, please organize your datasets as follows
 
         ```
-        $ ml-slowfast-llava/playground/data
+        $ Dcode/playground/data
             ├── video_qa
                 ├── MSVD_Zero_Shot_QA
                     ├── videos
@@ -144,21 +140,21 @@ by [Yiyang Huang](), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https:/
                         ├── all
                             ├── ...
                 ├── TGIF_Zero_Shot_QA
-                   ├── mp4
-                       ├── ...
+                   ├── mp4
+                       ├── ...
                 ├── Activitynet_Zero_Shot_QA
-                   ├── all_test
-                       ├── ...
+                   ├── all_test
+                       ├── ...
             ├── multiple_choice_qa
                 ├── NExTQA
                     ├── video
-                       ├── ...
+                       ├── ...
                 ├── EgoSchema
                     ├── video
-                       ├── ...
+                       ├── ...
                 ├── IntentQA
                     ├── video
-                       ├── ...
+                       ├── ...
         ```
 
 ## Inference and Evaluation
@@ -168,7 +164,7 @@ D-CoDe is a training-free method, so we can directly do the inference and evalua
 By default, we use 4 GPUs for the model inference. We can modify the `CUDA_VISIBLE_DEVICES` in the config file to accommodate your own settings.
 
 ```
-cd ml-slowfast-llava
+cd Dcode
 python run_inference.py --exp_config $PATH_TO_CONFIG_FILE
 ```
 
@@ -182,7 +178,7 @@ python run_inference.py --exp_config $PATH_TO_CONFIG_FILE
 - All of these can be changed in the config file.
 
 ## Acknowledgement
-We extend our gratitude to the following awesome projects: [LLaVA](https://github.com/haotian-liu/LLaVA), [SF-LLaVA](https://github.com/apple/ml-slowfast-llava) and [TS-LLaVA](https://github.com/tingyu215/TS-LLaVA).
+We extend our gratitude to the following awesome projects: [LLaVA](https://github.com/haotian-liu/LLaVA), [IG-VLM](https://github.com/imagegridworth/IG-VLM), [Video-LLaVA](https://github.com/PKU-YuanGroup/Video-LLaVA), [SF-LLaVA](https://github.com/apple/ml-slowfast-llava) and [TS-LLaVA](https://github.com/tingyu215/TS-LLaVA).
 
 
 
