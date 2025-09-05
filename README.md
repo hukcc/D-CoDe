@@ -10,7 +10,7 @@ by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.githu
 
 
 <p align="center">
-    <img src="assets/pipeline.png">
+    <img src="pipeline.png">
 </p>
 
 D-CoDe is a training-free framework for adapting image-pretrained vision-language models (VLMs) to video understanding. It achieves strong performance across multiple benchmarks, especially on long-video tasks, demonstrating its potential for complex video-language understanding.
