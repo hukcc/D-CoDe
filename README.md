@@ -4,7 +4,7 @@
 
 **Code will be released soon.**
 
-This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition]()
+This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition](https://arxiv.org/abs/2510.08818)
 
 by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https://www1.ece.neu.edu/~yunfu/).
 
