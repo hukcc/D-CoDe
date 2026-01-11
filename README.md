@@ -1,7 +1,7 @@
 # D-CoDe
 [EMNLP 2025🔥] D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition
 
-This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition](https://arxiv.org/abs/2510.08818)
+This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition](https://aclanthology.org/2025.emnlp-main.597/)
 
 by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https://www1.ece.neu.edu/~yunfu/).
 
@@ -186,9 +186,27 @@ We extend our gratitude to the following awesome projects: [LLaVA](https://githu
 
 ## Citations
 
-    @article{huang2025dcode,
-        title={D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition}, 
-        author={Yiyang Huang and Yizhou Wang and Yun Fu},
-        year={2025},
-        journal={arXiv preprint},
-    }
+If you find this work useful, please cite our paper:
+
+```bibtex
+@inproceedings{huang-etal-2025-code,
+    title = "{D}-{C}o{D}e: Scaling Image-Pretrained {VLM}s to Video via Dynamic Compression and Question Decomposition",
+    author = "Huang, Yiyang  and
+      Wang, Yizhou  and
+      Fu, Yun",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    year = "2025",
+    pages = "11798--11811",
+}
+```
+
+arXiv version:
+
+```bibtex
+@article{huang2025d,
+    title={D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition},
+    author={Huang, Yiyang and Wang, Yizhou and Fu, Yun},
+    journal={arXiv preprint arXiv:2510.08818},
+    year={2025}
+}
+```
