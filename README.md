@@ -1,9 +1,6 @@
 # D-CoDe
 [EMNLP 2025🔥] D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition
 
-
-**Code will be released soon.**
-
 This is the official implementation for [D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition](https://arxiv.org/abs/2510.08818)
 
 by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.github.io/), [Yun Fu](https://www1.ece.neu.edu/~yunfu/).
@@ -16,14 +13,55 @@ by [Yiyang Huang](https://hukcc.github.io/), [Yizhou Wang](https://wyzjack.githu
 D-CoDe is a training-free framework for adapting image-pretrained vision-language models (VLMs) to video understanding. It achieves strong performance across multiple benchmarks, especially on long-video tasks, demonstrating its potential for complex video-language understanding.
 
 ## Table of contents
+- [Core Components](#core-components)
+    - [Quick Start](#quick-start)
 - [Getting Started](#getting-started)
     - [Installation](#installation)
     - [Data Preparation](#data-preparation)
-- [Configuration](#configuration)
 - [Inference and Evaluation](#inference-and-evaluation)
     - [Output Structures](#output-structures)
 - [Acknowledgement](#Acknowledgement)
 - [Citations](#citations)
+
+## Core Components
+
+The core implementation is in `Dcode.py`, which provides three main functions:
+
+| Function | Description | Paper Method |
+|----------|-------------|--------------|
+| `generate_subquestions()` | Decompose questions into sub-questions using GPT-3.5 | Question Decomposition |
+| `supp_frame_selection()` | Select frames based on CLIP semantic similarity | Dynamic Compression (Frame) |
+| `token_select_and_merge()` | Select and merge visual tokens to reduce redundancy | Dynamic Compression (Token) |
+
+### Quick Start
+
+```python
+from Dcode import generate_subquestions, supp_frame_selection, token_select_and_merge, load_clip_model
+
+# 1. Question Decomposition (requires OPENAI_API_KEY environment variable)
+subquestions = generate_subquestions(
+    question="What did the person do after picking up the cup?",
+    prompt_variant="original"  # Options: "original", "no_background", "no_temporal_focus", "re"
+)
+
+# 2. Frame Selection (based on semantic diversity)
+clip_processor, clip_model = load_clip_model()
+selected_frames, frame_idxs = supp_frame_selection(
+    video_frames,           # List of PIL Images
+    N=15,                   # Number of frames to select
+    uniform_ratio=0.85,     # Ratio for uniform sampling
+    clip_model=clip_model,
+    clip_processor=clip_processor
+)
+
+# 3. Token Selection and Merge
+merged_features = token_select_and_merge(
+    image_features,                  # Tensor (T, N, D)
+    top_k=288,                       # Tokens to keep per frame
+    merge_strategy="mean",           # Options: "mean", "max", "weighted_mean"
+    similarity_threshold=0.8         # Similarity threshold for merging
+)
+```
 
 
 ## Getting Started
@@ -59,54 +97,18 @@ D-CoDe is a training-free framework for adapting image-pretrained vision-languag
 
 ### Data Preparation
 
-1. We prepare the ground-truth question and answer files based on [`IG-VLM`](https://github.com/imagegridworth/IG-VLM/tree/main), and put them under [playground/gt_qa_files](playground/gt_qa_files).
+1. **Ground-truth QA Files**: The ground-truth question and answer CSV files are already included in [playground/gt_qa_files](playground/gt_qa_files). These files are prepared based on [`IG-VLM`](https://github.com/imagegridworth/IG-VLM/tree/main).
 
-    - MSVD-QA
-        - Download the `MSVD_QA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/open_ended_qa/MSVD_QA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_msvd_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - MSRVTT-QA
-        - Download the `MSRVTT_QA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/open_ended_qa/MSRVTT_QA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_msrvtt_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - TGIF-QA
-        - Download the `TGIF_FrameQA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/open_ended_qa/TGIF_FrameQA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_tgif_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - Activitynet-QA
-        - Download the `Activitynet_QA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/open_ended_qa/ActivityNet_QA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_activitynet_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - NExT-QA
-        - Download the `NExT_QA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/multiple_choice_qa/NExT_QA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_nextqa_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - EgoSchema
-        - Download the `EgoSchema.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/multiple_choice_qa/EgoSchema.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_egoschema_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
-    - IntentQA
-        - Download the `IntentQA.csv` from the [`here`](https://github.com/imagegridworth/IG-VLM/blob/main/data/multiple_choice_qa/IntentQA.csv)
-        - Reformat the files by running
-            ```
-            python scripts/data/prepare_intentqa_qa_file.py --qa_file $PATH_TO_CSV_FILE
-            ```
+    Available datasets:
+    - MSVD-QA (`MSVDQA.csv`)
+    - MSRVTT-QA (`MSRVTTQA.csv`)
+    - TGIF-QA (`TGIFFrameQA.csv`)
+    - ActivityNet-QA (`ActivityNetQA.csv`)
+    - NExT-QA (`Next_QA.csv`)
+    - EgoSchema (`EgoSchema.csv`)
+    - IntentQA (`IntentQA.csv`)
 
-    
-
-2. Download the raw videos from the official websites.
+2. **Download Raw Videos**: Download the raw videos from the official websites.
 
     - Open-end VideoQA
 
@@ -125,7 +127,7 @@ D-CoDe is a training-free framework for adapting image-pretrained vision-languag
             - [`IntentQA`](https://github.com/JoseponLee/IntentQA)
 
 
-3. Organize the raw videos under [playground/data](playground/data).
+3. **Organize Videos**: Organize the raw videos under [playground/data](playground/data).
 
     - To directly use our data loaders without changing paths, please organize your datasets as follows
 

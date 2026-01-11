@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Output directories
+outputs/
+
+# Model weights (download separately)
+liuhaotian/
+liuhaotian
+
+# Video data (download separately)
+playground/data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
