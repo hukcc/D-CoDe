@@ -25,11 +25,11 @@ D-CoDe achieves state-of-the-art performance across **7 video understanding benc
 
 **Multiple-Choice VideoQA** (↑ higher is better)
 
-| Method | LLM | NExT-QA | EgoSchema | IntentQA |
-|:---|:---:|:---:|:---:|:---:|
-| SF-LLaVA | 7B | 64.2 | 47.2 | 60.1 |
-| TS-LLaVA | 7B | 66.5 | 50.2 | 61.7 |
-| **D-CoDe** | **7B** | **68.3** | **58.0** | **64.2** |
+| Method | NExT-QA | EgoSchema | IntentQA |
+|:---|:---:|:---:|:---:|
+| SF-LLaVA | 64.2 | 47.2 | 60.1 |
+| TS-LLaVA | 66.5 | 50.2 | 61.7 |
+| **D-CoDe** | **68.3** | **58.0** | **64.2** |
 
 </td>
 <td>
@@ -46,7 +46,7 @@ D-CoDe achieves state-of-the-art performance across **7 video understanding benc
 </tr>
 </table>
 
-> **Highlight:** On the challenging long-video benchmark **EgoSchema** (5-min videos), D-CoDe achieves **58.0%** accuracy — a **+7.8%** improvement over the previous best training-free method (TS-LLaVA 50.2%).
+> **Highlight:** On the challenging long-video benchmark **EgoSchema**, D-CoDe achieves **58.0%** accuracy — a **+7.8%** improvement over the previous best training-free method (TS-LLaVA 50.2%).
 
 ## Quick Start
 
