@@ -433,9 +433,30 @@
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-diagram-project"></i></span>Method</h2>
 
-        <div class="teaser-figure">
-            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges">
-            <p class="caption">Two key challenges in extending image-based VLMs to the video domain: perception bottleneck (static compression loses critical information) and token overload (visual tokens exceed model capacity).</p>
+        <h3 style="margin-bottom: 16px;">Challenges in Image-to-Video Adaptation</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Adapting image-pretrained VLMs to video requires effective token compression and comprehensive understanding of the resulting representations. We identify two key challenges that hinder this process:
+        </p>
+
+        <div class="teaser-figure" style="margin-bottom: 24px;">
+            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges" style="max-width: 85%;">
+        </div>
+
+        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%; margin-top: 0;">
+            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
+                <div style="flex: 0 0 50%;"><img src="static/def_perception_bottleneck.png" alt="Perception bottleneck experiment" style="width:100%; border-radius:8px;"></div>
+                <div style="flex: 1;">
+                    <h3>Perception Bottleneck</h3>
+                    <p>Static compression strategies such as uniform frame sampling and spatial average pooling lack semantic adaptivity and tend to discard informative cues that are unevenly distributed across temporal and spatial dimensions. As shown, static methods lead to notable performance degradation on EgoSchema (5 input frames), while <strong>dynamic compression</strong> alleviates this drop and even surpasses the uncompressed baseline by reducing redundancy while preserving informative visual cues.</p>
+                </div>
+            </div>
+            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
+                <div style="flex: 0 0 50%;"><img src="static/def_token_overload.png" alt="Token overload experiment" style="width:100%; border-radius:8px;"></div>
+                <div style="flex: 1;">
+                    <h3>Token Overload</h3>
+                    <p>Even after compression, video inputs contain substantially more visual tokens than static images, exceeding the capacity of image-pretrained VLMs. The vanilla model exhibits initial improvements followed by a performance plateau as the token count increases. In contrast, <strong>question decomposition</strong> consistently outperforms the baseline with a widening accuracy gap, demonstrating superior scalability to larger token volumes.</p>
+                </div>
+            </div>
         </div>
 
         <div class="method-figure">
@@ -583,19 +604,17 @@
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
             Question decomposition guides the model to attend to different aspects of the video. Each sub-question shifts the attention distribution to focus on distinct temporal regions.
         </p>
-        <div class="results-grid" style="grid-template-columns: repeat(3, 1fr); align-items: start;">
-            <div class="teaser-figure">
-                <img src="static/att_baseline.png" alt="Attention: original question">
-                <p class="caption">Original question</p>
-            </div>
-            <div class="teaser-figure">
-                <img src="static/att_sub1.png" alt="Attention: sub-question 1">
-                <p class="caption">Sub-question 1</p>
-            </div>
-            <div class="teaser-figure">
-                <img src="static/att_sub2.png" alt="Attention: sub-question 2">
-                <p class="caption">Sub-question 2</p>
-            </div>
+        <div class="teaser-figure">
+            <img src="static/att_baseline.png" alt="Attention: original question" style="max-width: 80%;">
+            <p class="caption">Original question</p>
+        </div>
+        <div class="teaser-figure">
+            <img src="static/att_sub1.png" alt="Attention: sub-question 1" style="max-width: 80%;">
+            <p class="caption">Sub-question 1</p>
+        </div>
+        <div class="teaser-figure">
+            <img src="static/att_sub2.png" alt="Attention: sub-question 2" style="max-width: 80%;">
+            <p class="caption">Sub-question 2</p>
         </div>
     </div>
 </section>
