@@ -387,6 +387,8 @@
             .method-cards { grid-template-columns: 1fr; }
             .results-grid { grid-template-columns: 1fr; }
             .links { flex-direction: column; align-items: center; }
+            .method-card[style*="display: flex"] { flex-direction: column !important; }
+            .method-card[style*="display: flex"] > div:first-child { flex: 1 1 auto !important; }
         }
     </style>
 </head>
@@ -428,36 +430,43 @@
     </div>
 </section>
 
+<!-- Motivation -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-lightbulb"></i></span>Motivation: Challenges in Image-to-Video Adaptation</h2>
+
+        <p class="abstract-text" style="margin-bottom: 28px;">
+            Adapting image-pretrained VLMs to video requires effective token compression and comprehensive understanding of the resulting representations. However, the <strong>perception bottleneck</strong> hinders efficient compression with minimal information loss, while <strong>token overload</strong> limits comprehensive interpretation of the compressed tokens, as their number still exceeds the capacity of image-pretrained VLMs.
+        </p>
+
+        <div class="teaser-figure" style="margin-bottom: 32px;">
+            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges">
+            <p class="caption">Two key challenges in extending image-based VLMs to video: the perception bottleneck (static compression discards informative cues) and token overload (visual tokens exceed model capacity).</p>
+        </div>
+
+        <div class="method-cards" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="method-card">
+                <h3>Perception Bottleneck</h3>
+                <p>Static compression strategies such as uniform frame sampling and spatial average pooling lack semantic adaptivity and tend to discard informative cues that are unevenly distributed across temporal and spatial dimensions. As shown below, static methods lead to notable performance degradation, while our <strong>dynamic compression</strong> alleviates this drop and even surpasses the uncompressed baseline.</p>
+                <img src="static/def_perception_bottleneck.png" alt="Perception bottleneck experiment" style="width:100%; margin-top:12px; border-radius:8px;">
+            </div>
+            <div class="method-card">
+                <h3>Token Overload</h3>
+                <p>Even after compression, video inputs contain substantially more visual tokens than static images, exceeding the capacity of image-pretrained VLMs. The vanilla model exhibits a performance plateau as the token count increases. In contrast, <strong>question decomposition</strong> consistently outperforms the baseline with a widening accuracy gap, demonstrating superior scalability.</p>
+                <img src="static/def_token_overload.png" alt="Token overload experiment" style="width:100%; margin-top:12px; border-radius:8px;">
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Method -->
 <section>
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-diagram-project"></i></span>Method</h2>
 
-        <h3 style="margin-bottom: 16px;">Challenges in Image-to-Video Adaptation</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            Adapting image-pretrained VLMs to video requires effective token compression and comprehensive understanding of the resulting representations. We identify two key challenges that hinder this process:
+        <p class="abstract-text" style="margin-bottom: 28px;">
+            To tackle these challenges, we introduce <strong>D-CoDe</strong>, a training-free framework that scales image-pretrained VLMs to video by integrating dynamic compression and question decomposition. Dynamic compression augments uniform sampling with supplementary frames and filters uninformative spatial tokens, while question decomposition reformulates complex queries into focused sub-questions for comprehensive understanding.
         </p>
-
-        <div class="teaser-figure" style="margin-bottom: 24px;">
-            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges" style="max-width: 85%;">
-        </div>
-
-        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%; margin-top: 0;">
-            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
-                <div style="flex: 0 0 50%;"><img src="static/def_perception_bottleneck.png" alt="Perception bottleneck experiment" style="width:100%; border-radius:8px;"></div>
-                <div style="flex: 1;">
-                    <h3>Perception Bottleneck</h3>
-                    <p>Static compression strategies such as uniform frame sampling and spatial average pooling lack semantic adaptivity and tend to discard informative cues that are unevenly distributed across temporal and spatial dimensions. As shown, static methods lead to notable performance degradation on EgoSchema (5 input frames), while <strong>dynamic compression</strong> alleviates this drop and even surpasses the uncompressed baseline by reducing redundancy while preserving informative visual cues.</p>
-                </div>
-            </div>
-            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
-                <div style="flex: 0 0 50%;"><img src="static/def_token_overload.png" alt="Token overload experiment" style="width:100%; border-radius:8px;"></div>
-                <div style="flex: 1;">
-                    <h3>Token Overload</h3>
-                    <p>Even after compression, video inputs contain substantially more visual tokens than static images, exceeding the capacity of image-pretrained VLMs. The vanilla model exhibits initial improvements followed by a performance plateau as the token count increases. In contrast, <strong>question decomposition</strong> consistently outperforms the baseline with a widening accuracy gap, demonstrating superior scalability to larger token volumes.</p>
-                </div>
-            </div>
-        </div>
 
         <div class="method-figure">
             <img src="static/pipeline.png" alt="D-CoDe Framework Pipeline">
