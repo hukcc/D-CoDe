@@ -433,26 +433,30 @@
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-diagram-project"></i></span>Method</h2>
 
+        <div class="teaser-figure">
+            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges">
+            <p class="caption">Two key challenges in extending image-based VLMs to the video domain: perception bottleneck (static compression loses critical information) and token overload (visual tokens exceed model capacity).</p>
+        </div>
+
         <div class="method-figure">
             <img src="static/pipeline.png" alt="D-CoDe Framework Pipeline">
             <p class="caption">Overview of the D-CoDe framework. Dynamic compression adaptively selects representative frames and aggregates spatial tokens, while question decomposition reformulates the query into sub-questions for more comprehensive video understanding.</p>
         </div>
 
-        <div class="method-cards">
-            <div class="method-card">
-                <div class="card-icon">&#x1F3AC;</div>
-                <h3>Supplementary Frame Selection</h3>
-                <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
+        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%;">
+            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
+                <div style="flex: 0 0 55%;"><img src="static/frame_selection.png" alt="Supplementary Frame Selection" style="width:100%; border-radius:8px;"></div>
+                <div style="flex: 1;">
+                    <h3>Supplementary Frame Selection</h3>
+                    <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
+                </div>
             </div>
-            <div class="method-card">
-                <div class="card-icon">&#x1F50D;</div>
-                <h3>Spatial Token Pruning &amp; Merging</h3>
-                <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
-            </div>
-            <div class="method-card">
-                <div class="card-icon">&#x2753;</div>
-                <h3>Question Decomposition</h3>
-                <p>Decompose the original question into sub-questions via GPT-3.5, independently reason each sub-answer, then aggregate sub-answers with the original question for the final response.</p>
+            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
+                <div style="flex: 0 0 55%;"><img src="static/token_pruning_merging.png" alt="Spatial Token Pruning and Merging" style="width:100%; border-radius:8px;"></div>
+                <div style="flex: 1;">
+                    <h3>Spatial Token Pruning &amp; Merging</h3>
+                    <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -551,44 +555,47 @@
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-images"></i></span>Qualitative Examples</h2>
 
-        <h3 style="margin-top: 16px; margin-bottom: 12px;">Dynamic Compression Visualization</h3>
+        <h3 style="margin-top: 16px; margin-bottom: 12px;">Temporal Compression Visualization</h3>
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            D-CoDe's dynamic compression works in both temporal and spatial dimensions to adaptively preserve informative content while reducing redundancy.
+            Yellow frames are uniformly sampled; green frames are supplementary selections that maximize semantic diversity, capturing key moments missed by uniform sampling.
+        </p>
+        <div class="teaser-figure">
+            <img src="static/vis_temporal.png" alt="Temporal compression visualization">
+            <p class="caption">Supplementary frame selection enhances temporal diversity by selecting frames with maximum semantic difference from uniformly sampled frames.</p>
+        </div>
+
+        <h3 style="margin-top: 40px; margin-bottom: 12px;">Spatial Compression Visualization</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Low-activation tokens (background regions) are pruned, and semantically similar remaining tokens are merged into clusters.
         </p>
         <div class="results-grid" style="grid-template-columns: repeat(2, 1fr); align-items: start;">
-            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
-                <h3 style="margin-bottom: 12px; font-size: 1rem;">Temporal: Supplementary Frame Selection</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
-                    Yellow frames are uniformly sampled; green frames are supplementary selections that maximize semantic diversity. The supplementary frames capture key moments missed by uniform sampling, such as action transitions and scene changes.
-                </p>
+            <div class="teaser-figure">
+                <img src="static/vis_spatial_1.png" alt="Spatial compression example 1">
+                <p class="caption">Spatial token pruning &amp; merging — Example 1</p>
             </div>
-            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
-                <h3 style="margin-bottom: 12px; font-size: 1rem;">Spatial: Token Pruning &amp; Merging</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
-                    Low-activation tokens (background regions) are pruned, and semantically similar remaining tokens are merged into clusters. This preserves fine-grained details of objects and actions while significantly reducing the token count.
-                </p>
+            <div class="teaser-figure">
+                <img src="static/vis_spatial_2.png" alt="Spatial compression example 2">
+                <p class="caption">Spatial token pruning &amp; merging — Example 2</p>
             </div>
         </div>
 
-        <h3 style="margin-top: 40px; margin-bottom: 12px;">Question Decomposition Examples</h3>
+        <h3 style="margin-top: 40px; margin-bottom: 12px;">Attention Visualization</h3>
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            The question decomposition module reformulates complex questions into focused sub-questions, guiding the model to attend to different temporal aspects of the video.
+            Question decomposition guides the model to attend to different aspects of the video. Each sub-question shifts the attention distribution to focus on distinct temporal regions.
         </p>
-        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
-            <div style="margin-bottom: 16px;">
-                <strong style="color: var(--primary);">Original Question:</strong>
-                <span style="margin-left: 8px;">"What did the person do after picking up the cup?"</span>
+        <div class="results-grid" style="grid-template-columns: repeat(3, 1fr); align-items: start;">
+            <div class="teaser-figure">
+                <img src="static/att_baseline.png" alt="Attention: original question">
+                <p class="caption">Original question</p>
             </div>
-            <div style="padding-left: 20px; border-left: 3px solid var(--primary); margin-bottom: 12px;">
-                <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                    <strong>Sub-Q1:</strong> What action did the person perform immediately after grasping the cup?<br>
-                    <strong>Sub-Q2:</strong> Did the person move to a different location after picking up the cup?<br>
-                    <strong>Sub-Q3:</strong> Were there any interactions with other objects after picking up the cup?
-                </p>
+            <div class="teaser-figure">
+                <img src="static/att_sub1.png" alt="Attention: sub-question 1">
+                <p class="caption">Sub-question 1</p>
             </div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary);">
-                Each sub-question focuses on a distinct aspect, enabling the model to build a comprehensive understanding before generating the final answer.
-            </p>
+            <div class="teaser-figure">
+                <img src="static/att_sub2.png" alt="Attention: sub-question 2">
+                <p class="caption">Sub-question 2</p>
+            </div>
         </div>
     </div>
 </section>
