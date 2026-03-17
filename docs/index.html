@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-CoDe — Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #f59e0b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --bg-code: #1e293b;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --max-width: 960px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #fefce8 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .hero h1 span { color: var(--primary); }
+
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 28px;
+            line-height: 1.6;
+        }
+
+        .hero .venue {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .authors {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .authors a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .authors a:hover { color: var(--primary); }
+
+        .affiliation {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+
+        .links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .links .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .links .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .links .btn-outline {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .links .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* Sections */
+        section {
+            padding: 60px 0;
+        }
+
+        section:nth-child(even) {
+            background: var(--bg-alt);
+        }
+
+        section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+
+        section h2 .section-icon {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        /* Abstract */
+        .abstract-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #334155;
+            text-align: justify;
+        }
+
+        /* Method */
+        .method-figure {
+            text-align: center;
+            margin: 32px 0;
+        }
+
+        .method-figure img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .method-figure .caption {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        .method-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .method-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .method-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .method-card .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .method-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .method-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .result-block {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .result-block h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 16px 20px;
+            background: var(--bg-alt);
+            border-bottom: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 10px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        td:first-child, th:first-child {
+            text-align: left;
+        }
+
+        .table-wide td:nth-child(2), .table-wide th:nth-child(2) {
+            text-align: left;
+        }
+
+        tr.ours {
+            background: #eff6ff;
+            font-weight: 600;
+        }
+
+        tr.ours td:first-child {
+            color: var(--primary);
+        }
+
+        .highlight-note {
+            margin-top: 24px;
+            padding: 16px 20px;
+            background: #fefce8;
+            border-left: 4px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 0.92rem;
+            color: #713f12;
+        }
+
+        /* Teaser / Qualitative */
+        .teaser-figure {
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .teaser-figure img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .teaser-figure .caption {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        /* Code */
+        .code-block {
+            background: var(--bg-code);
+            border-radius: var(--radius);
+            padding: 24px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-block pre {
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        .code-block .comment { color: #64748b; }
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #86efac; }
+        .code-block .func { color: #93c5fd; }
+        .code-block .number { color: #fbbf24; }
+
+        /* BibTeX */
+        .bibtex-block {
+            background: var(--bg-code);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: relative;
+        }
+
+        .bibtex-block pre {
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .method-cards { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .links { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+    <div class="container">
+        <div class="venue">EMNLP 2025</div>
+        <h1><span>D-CoDe</span>: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition</h1>
+        <p class="subtitle">A training-free framework that adapts image-pretrained VLMs to video understanding through dynamic compression and question decomposition.</p>
+        <p class="authors">
+            <a href="https://hukcc.github.io/">Yiyang Huang</a>,
+            <a href="https://wyzjack.github.io/">Yizhou Wang</a>,
+            <a href="https://www1.ece.neu.edu/~yunfu/">Yun Fu</a>
+        </p>
+        <p class="affiliation">Northeastern University</p>
+        <div class="links">
+            <a href="https://arxiv.org/abs/2510.08818" class="btn-primary">
+                <i class="fa-solid fa-file-lines"></i> Paper (arXiv)
+            </a>
+            <a href="https://aclanthology.org/2025.emnlp-main.597/" class="btn-outline">
+                <i class="fa-solid fa-book"></i> ACL Anthology
+            </a>
+            <a href="https://github.com/hukcc/D-CoDe" class="btn-outline">
+                <i class="fa-brands fa-github"></i> Code
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Abstract -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-scroll"></i></span>Abstract</h2>
+        <p class="abstract-text">
+            Video large language models (Vid-LLMs), which excel in diverse video-language tasks, can be effectively constructed by adapting image-pretrained vision-language models (VLMs). However, this adaptation remains challenging, as it requires processing dense and temporally extended visual inputs that exceed the capacity of image-based models. This paper identifies the <strong>perception bottleneck</strong> and <strong>token overload</strong> as key challenges in extending image-based VLMs to the video domain. To address these issues, we propose <strong>D-CoDe</strong>, a training-free adaptation framework that incorporates <em>dynamic compression</em> and <em>question decomposition</em>. Specifically, dynamic compression alleviates the perception bottleneck through adaptive selection of representative frames and content-aware aggregation of spatial tokens, thereby reducing redundancy while preserving informative content. In parallel, question decomposition mitigates token overload by reformulating the original query into sub-questions, guiding the model to focus on distinct aspects of the video and enabling more comprehensive understanding. Experiments demonstrate that D-CoDe effectively improves video understanding across various benchmarks. Furthermore, strong performance on the challenging long-video benchmark highlights the potential of D-CoDe in handling complex video-language tasks.
+        </p>
+    </div>
+</section>
+
+<!-- Method -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-diagram-project"></i></span>Method</h2>
+
+        <div class="method-figure">
+            <img src="static/pipeline.png" alt="D-CoDe Framework Pipeline">
+            <p class="caption">Overview of the D-CoDe framework. Dynamic compression adaptively selects representative frames and aggregates spatial tokens, while question decomposition reformulates the query into sub-questions for more comprehensive video understanding.</p>
+        </div>
+
+        <div class="method-cards">
+            <div class="method-card">
+                <div class="card-icon">&#x1F3AC;</div>
+                <h3>Supplementary Frame Selection</h3>
+                <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
+            </div>
+            <div class="method-card">
+                <div class="card-icon">&#x1F50D;</div>
+                <h3>Spatial Token Pruning &amp; Merging</h3>
+                <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
+            </div>
+            <div class="method-card">
+                <div class="card-icon">&#x2753;</div>
+                <h3>Question Decomposition</h3>
+                <p>Decompose the original question into sub-questions via GPT-3.5, independently reason each sub-answer, then aggregate sub-answers with the original question for the final response.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-chart-line"></i></span>Results</h2>
+
+        <div class="results-grid">
+            <div class="result-block">
+                <h3>Multiple-Choice VideoQA &uarr;</h3>
+                <table>
+                    <thead><tr><th>Method</th><th>NExT-QA</th><th>EgoSchema</th><th>IntentQA</th></tr></thead>
+                    <tbody>
+                        <tr><td>IG-VLM</td><td>63.1</td><td>35.8</td><td>60.3</td></tr>
+                        <tr><td>SF-LLaVA</td><td>64.2</td><td>47.2</td><td>60.1</td></tr>
+                        <tr><td>TS-LLaVA</td><td>66.5</td><td>50.2</td><td>61.7</td></tr>
+                        <tr class="ours"><td>D-CoDe</td><td><strong>68.3</strong></td><td><strong>58.0</strong></td><td><strong>64.2</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="result-block">
+                <h3>Open-Ended VideoQA — Accuracy &uarr;</h3>
+                <table>
+                    <thead><tr><th>Method</th><th>MSVD</th><th>MSRVTT</th><th>TGIF</th><th>ANet</th></tr></thead>
+                    <tbody>
+                        <tr><td>IG-VLM</td><td>78.8</td><td>63.7</td><td>73.0</td><td>54.3</td></tr>
+                        <tr><td>SF-LLaVA</td><td>79.1</td><td><strong>65.8</strong></td><td>78.7</td><td>55.5</td></tr>
+                        <tr><td>TS-LLaVA</td><td>79.0</td><td>65.1</td><td>77.7</td><td>56.7</td></tr>
+                        <tr class="ours"><td>D-CoDe</td><td><strong>80.0</strong></td><td>64.2</td><td><strong>79.1</strong></td><td>56.4</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="results-grid" style="margin-top: 24px;">
+            <div class="result-block" style="grid-column: 1 / -1;">
+                <h3>Full Comparison — All Methods (7B LLM, CLIP-L Visual Encoder)</h3>
+                <table class="table-wide">
+                    <thead>
+                        <tr><th>Method</th><th>Type</th><th>NExT-QA</th><th>EgoSchema</th><th>IntentQA</th><th>MSVD</th><th>MSRVTT</th><th>TGIF</th><th>ANet</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Video-LLaVA</td><td>trained</td><td>60.5</td><td>37.0</td><td>—</td><td>70.7</td><td>59.2</td><td>70.0</td><td>45.3</td></tr>
+                        <tr><td>MovieChat+</td><td>trained</td><td>54.8</td><td>56.4</td><td>—</td><td>76.5</td><td>53.9</td><td>—</td><td>48.1</td></tr>
+                        <tr><td>PLLaVA</td><td>trained</td><td>—</td><td>—</td><td>—</td><td>76.6</td><td>62.0</td><td>77.5</td><td>56.3</td></tr>
+                        <tr><td>DeepStack-L</td><td>free</td><td>61.0</td><td>38.4</td><td>—</td><td>76.0</td><td>—</td><td>—</td><td>49.3</td></tr>
+                        <tr><td>M&sup3;</td><td>free</td><td>63.1</td><td>36.8</td><td>58.8</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                        <tr><td>IG-VLM</td><td>free</td><td>63.1</td><td>35.8</td><td>60.3</td><td>78.8</td><td>63.7</td><td>73.0</td><td>54.3</td></tr>
+                        <tr><td>SF-LLaVA</td><td>free</td><td>64.2</td><td>47.2</td><td>60.1</td><td>79.1</td><td><strong>65.8</strong></td><td>78.7</td><td>55.5</td></tr>
+                        <tr><td>TS-LLaVA</td><td>free</td><td>66.5</td><td>50.2</td><td>61.7</td><td>79.0</td><td>65.1</td><td>77.7</td><td><strong>56.7</strong></td></tr>
+                        <tr class="ours"><td>D-CoDe (Ours)</td><td>free</td><td><strong>68.3</strong></td><td><strong>58.0</strong></td><td><strong>64.2</strong></td><td><strong>80.0</strong></td><td>64.2</td><td><strong>79.1</strong></td><td>56.4</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="results-grid" style="margin-top: 24px;">
+            <div class="result-block">
+                <h3>Module Ablation (EgoSchema) &uarr;</h3>
+                <table>
+                    <thead><tr><th>Module</th><th>Acc. (%)</th></tr></thead>
+                    <tbody>
+                        <tr><td>Baseline</td><td>44.8</td></tr>
+                        <tr><td>+ Spatial Compression</td><td>50.6</td></tr>
+                        <tr><td>+ Temporal Selection</td><td>51.8</td></tr>
+                        <tr class="ours"><td>+ Question Decomposition</td><td><strong>58.0</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="result-block">
+                <h3>Efficiency Analysis (EgoSchema)</h3>
+                <table>
+                    <thead><tr><th>Module</th><th>Acc. (%)</th><th>s/sample</th></tr></thead>
+                    <tbody>
+                        <tr><td>Baseline</td><td>44.8</td><td>3.93</td></tr>
+                        <tr><td>+ Dynamic Compression</td><td>51.8</td><td>6.12</td></tr>
+                        <tr class="ours"><td>+ Question Decomposition</td><td><strong>58.0</strong></td><td>37.40</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="highlight-note">
+            <strong>Key takeaway:</strong> On the challenging long-video benchmark EgoSchema (5-min videos), D-CoDe achieves <strong>58.0%</strong> accuracy — a <strong>+7.8%</strong> improvement over the previous best training-free method TS-LLaVA (50.2%), demonstrating its strength in complex video understanding.
+        </div>
+    </div>
+</section>
+
+<!-- Qualitative Examples -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-images"></i></span>Qualitative Examples</h2>
+
+        <h3 style="margin-top: 16px; margin-bottom: 12px;">Dynamic Compression Visualization</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            D-CoDe's dynamic compression works in both temporal and spatial dimensions to adaptively preserve informative content while reducing redundancy.
+        </p>
+        <div class="results-grid" style="grid-template-columns: repeat(2, 1fr); align-items: start;">
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
+                <h3 style="margin-bottom: 12px; font-size: 1rem;">Temporal: Supplementary Frame Selection</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                    Yellow frames are uniformly sampled; green frames are supplementary selections that maximize semantic diversity. The supplementary frames capture key moments missed by uniform sampling, such as action transitions and scene changes.
+                </p>
+            </div>
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
+                <h3 style="margin-bottom: 12px; font-size: 1rem;">Spatial: Token Pruning &amp; Merging</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                    Low-activation tokens (background regions) are pruned, and semantically similar remaining tokens are merged into clusters. This preserves fine-grained details of objects and actions while significantly reducing the token count.
+                </p>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 40px; margin-bottom: 12px;">Question Decomposition Examples</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            The question decomposition module reformulates complex questions into focused sub-questions, guiding the model to attend to different temporal aspects of the video.
+        </p>
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;">
+            <div style="margin-bottom: 16px;">
+                <strong style="color: var(--primary);">Original Question:</strong>
+                <span style="margin-left: 8px;">"What did the person do after picking up the cup?"</span>
+            </div>
+            <div style="padding-left: 20px; border-left: 3px solid var(--primary); margin-bottom: 12px;">
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                    <strong>Sub-Q1:</strong> What action did the person perform immediately after grasping the cup?<br>
+                    <strong>Sub-Q2:</strong> Did the person move to a different location after picking up the cup?<br>
+                    <strong>Sub-Q3:</strong> Were there any interactions with other objects after picking up the cup?
+                </p>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                Each sub-question focuses on a distinct aspect, enabling the model to build a comprehensive understanding before generating the final answer.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Code -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-code"></i></span>Code</h2>
+        <p style="margin-bottom: 16px;">D-CoDe provides three modular functions that can be used independently or combined:</p>
+
+        <div class="code-block">
+<pre><span class="keyword">from</span> Dcode <span class="keyword">import</span> generate_subquestions, supp_frame_selection, token_select_and_merge, load_clip_model
+
+<span class="comment"># 1. Question Decomposition (requires OPENAI_API_KEY)</span>
+subquestions = <span class="func">generate_subquestions</span>(
+    question=<span class="string">"What did the person do after picking up the cup?"</span>,
+    prompt_variant=<span class="string">"original"</span>
+)
+
+<span class="comment"># 2. Frame Selection (based on semantic diversity)</span>
+clip_processor, clip_model = <span class="func">load_clip_model</span>()
+selected_frames, frame_idxs = <span class="func">supp_frame_selection</span>(
+    video_frames,
+    N=<span class="number">15</span>,
+    uniform_ratio=<span class="number">0.85</span>,
+    clip_model=clip_model,
+    clip_processor=clip_processor
+)
+
+<span class="comment"># 3. Token Selection and Merge</span>
+merged_features = <span class="func">token_select_and_merge</span>(
+    image_features,
+    top_k=<span class="number">288</span>,
+    merge_strategy=<span class="string">"mean"</span>,
+    similarity_threshold=<span class="number">0.8</span>
+)</pre>
+        </div>
+
+        <p style="margin-top: 16px;">
+            See the <a href="https://github.com/hukcc/D-CoDe" style="color: var(--primary); font-weight: 500;">GitHub repository</a> for full installation instructions, data preparation, and evaluation scripts.
+        </p>
+    </div>
+</section>
+
+<!-- BibTeX -->
+<section>
+    <div class="container">
+        <h2><span class="section-icon"><i class="fa-solid fa-quote-left"></i></span>BibTeX</h2>
+        <p style="margin-bottom: 16px;">If you find this work useful, please cite our paper:</p>
+
+        <p style="margin-bottom: 8px; font-weight: 500;">EMNLP version:</p>
+        <div class="bibtex-block" style="margin-bottom: 20px;">
+            <button class="copy-btn" onclick="copyBibtex('bibtex-emnlp')"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre id="bibtex-emnlp">@inproceedings{huang-etal-2025-code,
+    title = "{D}-{C}o{D}e: Scaling Image-Pretrained {VLM}s to Video via Dynamic Compression and Question Decomposition",
+    author = "Huang, Yiyang  and
+      Wang, Yizhou  and
+      Fu, Yun",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    year = "2025",
+    pages = "11798--11811",
+}</pre>
+        </div>
+
+        <p style="margin-bottom: 8px; font-weight: 500;">arXiv version:</p>
+        <div class="bibtex-block">
+            <button class="copy-btn" onclick="copyBibtex('bibtex-arxiv')"><i class="fa-regular fa-copy"></i> Copy</button>
+<pre id="bibtex-arxiv">@article{huang2025d,
+    title={D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition},
+    author={Huang, Yiyang and Wang, Yizhou and Fu, Yun},
+    journal={arXiv preprint arXiv:2510.08818},
+    year={2025}
+}</pre>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>D-CoDe &copy; 2025 &middot; <a href="https://github.com/hukcc/D-CoDe">GitHub</a> &middot; Released under the <a href="https://github.com/hukcc/D-CoDe/blob/main/LICENSE">Apache 2.0 License</a></p>
+    </div>
+</footer>
+
+<script>
+function copyBibtex(id) {
+    const text = document.getElementById(id).textContent;
+    const btn = document.getElementById(id).parentElement.querySelector('.copy-btn');
+    navigator.clipboard.writeText(text).then(() => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+        }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
