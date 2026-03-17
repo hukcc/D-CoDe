@@ -439,9 +439,14 @@
             Adapting image-pretrained VLMs to video requires effective token compression and comprehensive understanding of the resulting representations. However, the <strong>perception bottleneck</strong> hinders efficient compression with minimal information loss, while <strong>token overload</strong> limits comprehensive interpretation of the compressed tokens, as their number still exceeds the capacity of image-pretrained VLMs.
         </p>
 
-        <div class="teaser-figure" style="margin-bottom: 32px;">
-            <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges">
-            <p class="caption">Two key challenges in extending image-based VLMs to video: the perception bottleneck (static compression discards informative cues) and token overload (visual tokens exceed model capacity).</p>
+        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%; margin-top: 0; margin-bottom: 32px;">
+            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
+                <div style="flex: 0 0 55%;"><img src="static/teaser.png" alt="Perception bottleneck and token overload challenges" style="width:100%; border-radius:8px;"></div>
+                <div style="flex: 1;">
+                    <h3>Two Key Challenges</h3>
+                    <p>We identify two key challenges in extending image-based VLMs to the video domain: <strong>Perception Bottleneck</strong> — static compression (uniform sampling, average pooling) treats all content uniformly, discarding informative cues that are dynamically distributed across temporal and spatial dimensions; <strong>Token Overload</strong> — even after compression, the number of visual tokens still far exceeds image-model capacity, causing performance saturation as the model cannot effectively interpret the excess information.</p>
+                </div>
+            </div>
         </div>
 
         <div class="method-cards" style="grid-template-columns: repeat(2, 1fr);">
@@ -473,20 +478,16 @@
             <p class="caption">Overview of the D-CoDe framework. Dynamic compression adaptively selects representative frames and aggregates spatial tokens, while question decomposition reformulates the query into sub-questions for more comprehensive video understanding.</p>
         </div>
 
-        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%;">
-            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
-                <div style="flex: 0 0 55%;"><img src="static/frame_selection.png" alt="Supplementary Frame Selection" style="width:100%; border-radius:8px;"></div>
-                <div style="flex: 1;">
-                    <h3>Supplementary Frame Selection</h3>
-                    <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
-                </div>
+        <div class="method-cards" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="method-card">
+                <h3>Supplementary Frame Selection</h3>
+                <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
+                <img src="static/frame_selection.png" alt="Supplementary Frame Selection" style="width:100%; margin-top:12px; border-radius:8px;">
             </div>
-            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
-                <div style="flex: 0 0 55%;"><img src="static/token_pruning_merging.png" alt="Spatial Token Pruning and Merging" style="width:100%; border-radius:8px;"></div>
-                <div style="flex: 1;">
-                    <h3>Spatial Token Pruning &amp; Merging</h3>
-                    <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
-                </div>
+            <div class="method-card">
+                <h3>Spatial Token Pruning &amp; Merging</h3>
+                <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
+                <img src="static/token_pruning_merging.png" alt="Spatial Token Pruning and Merging" style="width:100%; margin-top:12px; border-radius:8px;">
             </div>
         </div>
     </div>
@@ -589,8 +590,8 @@
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
             Yellow frames are uniformly sampled; green frames are supplementary selections that maximize semantic diversity, capturing key moments missed by uniform sampling.
         </p>
-        <div class="teaser-figure">
-            <img src="static/vis_temporal.png" alt="Temporal compression visualization">
+        <div class="teaser-figure" style="margin: 24px 0;">
+            <img src="static/vis_temporal.png" alt="Temporal compression visualization" style="width: 100%; max-width: none;">
             <p class="caption">Supplementary frame selection enhances temporal diversity by selecting frames with maximum semantic difference from uniformly sampled frames.</p>
         </div>
 
@@ -598,13 +599,13 @@
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
             Low-activation tokens (background regions) are pruned, and semantically similar remaining tokens are merged into clusters.
         </p>
-        <div class="results-grid" style="grid-template-columns: repeat(2, 1fr); align-items: start;">
-            <div class="teaser-figure">
-                <img src="static/vis_spatial_1.png" alt="Spatial compression example 1">
+        <div style="display: flex; gap: 16px; align-items: start;">
+            <div class="teaser-figure" style="flex: 1; margin: 0;">
+                <img src="static/vis_spatial_1.png" alt="Spatial compression example 1" style="width: 100%;">
                 <p class="caption">Spatial token pruning &amp; merging — Example 1</p>
             </div>
-            <div class="teaser-figure">
-                <img src="static/vis_spatial_2.png" alt="Spatial compression example 2">
+            <div class="teaser-figure" style="flex: 1; margin: 0;">
+                <img src="static/vis_spatial_2.png" alt="Spatial compression example 2" style="width: 100%;">
                 <p class="caption">Spatial token pruning &amp; merging — Example 2</p>
             </div>
         </div>
@@ -613,17 +614,19 @@
         <p style="color: var(--text-secondary); margin-bottom: 20px;">
             Question decomposition guides the model to attend to different aspects of the video. Each sub-question shifts the attention distribution to focus on distinct temporal regions.
         </p>
-        <div class="teaser-figure">
-            <img src="static/att_baseline.png" alt="Attention: original question" style="max-width: 80%;">
-            <p class="caption">Original question</p>
-        </div>
-        <div class="teaser-figure">
-            <img src="static/att_sub1.png" alt="Attention: sub-question 1" style="max-width: 80%;">
-            <p class="caption">Sub-question 1</p>
-        </div>
-        <div class="teaser-figure">
-            <img src="static/att_sub2.png" alt="Attention: sub-question 2" style="max-width: 80%;">
-            <p class="caption">Sub-question 2</p>
+        <div class="results-grid" style="grid-template-columns: repeat(3, 1fr); align-items: start;">
+            <div class="teaser-figure">
+                <img src="static/att_baseline.png" alt="Attention: original question">
+                <p class="caption">Original question</p>
+            </div>
+            <div class="teaser-figure">
+                <img src="static/att_sub1.png" alt="Attention: sub-question 1">
+                <p class="caption">Sub-question 1</p>
+            </div>
+            <div class="teaser-figure">
+                <img src="static/att_sub2.png" alt="Attention: sub-question 2">
+                <p class="caption">Sub-question 2</p>
+            </div>
         </div>
     </div>
 </section>
