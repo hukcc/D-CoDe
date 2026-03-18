@@ -81,12 +81,12 @@ merged_features = token_select_and_merge(
 ### Run Full Evaluation
 
 ```bash
-# Open-ended VideoQA (e.g., EgoSchema)
+# Multiple-Choice VideoQA
 bash scripts/run_eval_egoschema.sh
-
-# Other benchmarks
 bash scripts/run_eval_nextqa.sh
 bash scripts/run_eval_intentqa.sh
+
+# Open-Ended VideoQA
 bash scripts/run_eval_msvd.sh
 bash scripts/run_eval_msrvtt.sh
 bash scripts/run_eval_tgif.sh
