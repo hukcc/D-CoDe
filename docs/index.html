@@ -1,31 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="top">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="D-CoDe (EMNLP 2025): training-free adaptation of image-pretrained VLMs to video via dynamic compression and question decomposition — strong results on long-video and VideoQA benchmarks.">
+    <meta name="keywords" content="D-CoDe, VLM, video understanding, dynamic compression, question decomposition, EMNLP 2025">
+    <meta name="theme-color" content="#2563eb">
     <title>D-CoDe — Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition</title>
+    <link rel="canonical" href="https://hukcc.github.io/D-CoDe/">
+    <meta property="og:title" content="D-CoDe — Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition">
+    <meta property="og:description" content="D-CoDe (EMNLP 2025): training-free video adaptation via dynamic frame/token compression and question decomposition.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hukcc.github.io/D-CoDe/">
+    <meta property="og:image" content="https://hukcc.github.io/D-CoDe/static/pipeline.png">
+    <meta property="og:image:width" content="10024">
+    <meta property="og:image:height" content="3720">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="D-CoDe — Dynamic Compression and Question Decomposition for Video VLMs">
+    <meta name="twitter:description" content="Training-free scaling of image-pretrained VLMs to video (EMNLP 2025).">
+    <meta name="twitter:image" content="https://hukcc.github.io/D-CoDe/static/pipeline.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
+            color-scheme: light dark;
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
             --accent: #f59e0b;
             --bg: #ffffff;
             --bg-alt: #f8fafc;
             --bg-code: #1e293b;
+            --card-bg: #ffffff;
             --text: #1e293b;
             --text-secondary: #64748b;
+            --abstract-text: #334155;
             --border: #e2e8f0;
             --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
             --radius: 12px;
             --max-width: 960px;
+            --ours-bg: #eff6ff;
+            --ours-text: #1e40af;
+            --highlight-bg: #fefce8;
+            --highlight-text: #713f12;
+            --highlight-border: #f59e0b;
+            --hero-gradient: linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #fefce8 100%);
+            --btn-outline-bg: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #60a5fa;
+                --primary-dark: #3b82f6;
+                --accent: #fbbf24;
+                --bg: #0f172a;
+                --bg-alt: #1e293b;
+                --bg-code: #0c1222;
+                --card-bg: #1e293b;
+                --text: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --abstract-text: #cbd5e1;
+                --border: #334155;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-lg: 0 10px 30px rgba(0,0,0,0.45);
+                --ours-bg: rgba(37, 99, 235, 0.25);
+                --ours-text: #93c5fd;
+                --highlight-bg: rgba(245, 158, 11, 0.15);
+                --highlight-text: #fde68a;
+                --highlight-border: #f59e0b;
+                --hero-gradient: linear-gradient(135deg, #172554 0%, #0f172a 50%, #422006 100%);
+                --btn-outline-bg: #1e293b;
+            }
+
+            .links .btn-primary:hover {
+                box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+            }
+
+            .links .btn-outline:hover {
+                background: rgba(96, 165, 250, 0.08);
+            }
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -35,25 +97,162 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        main section {
+            scroll-margin-top: 1rem;
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        summary:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
         .container {
             max-width: var(--max-width);
             margin: 0 auto;
-            padding: 0 24px;
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+        }
+
+        /* TOC */
+        .toc-nav {
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            padding: 12px 0;
+        }
+
+        .toc-details {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            background: var(--card-bg);
+        }
+
+        .toc-details[open] {
+            padding-bottom: 16px;
+        }
+
+        .toc-summary {
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text);
+            list-style: none;
+        }
+
+        .toc-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .toc-summary::after {
+            content: " \25BC";
+            font-size: 0.65rem;
+            opacity: 0.7;
+        }
+
+        .toc-details[open] .toc-summary::after {
+            content: " \25B2";
+        }
+
+        .toc-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            list-style: none;
+            margin: 0;
+            padding: 12px 0 0;
+            justify-content: center;
+        }
+
+        .toc-list a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .toc-list a:hover {
+            background: var(--bg-alt);
+            text-decoration: underline;
+        }
+
+        @media (min-width: 769px) {
+            .toc-details {
+                border: none;
+                padding: 16px 0;
+                background: transparent;
+            }
+
+            .toc-summary {
+                display: none;
+            }
+
+            .toc-list {
+                padding-top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toc-list {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toc-list a {
+                padding: 10px 12px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed;
+            right: max(16px, env(safe-area-inset-right));
+            bottom: max(16px, env(safe-area-inset-bottom));
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-dark);
         }
 
         /* Hero */
         .hero {
             text-align: center;
-            padding: 80px 0 60px;
-            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 50%, #fefce8 100%);
+            padding: clamp(48px, 10vw, 80px) 0 clamp(40px, 8vw, 60px);
+            background: var(--hero-gradient);
             border-bottom: 1px solid var(--border);
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: clamp(1.35rem, 4.5vw, 3rem);
             font-weight: 700;
             letter-spacing: -0.02em;
             margin-bottom: 8px;
+            line-height: 1.2;
         }
 
         .hero h1 span { color: var(--primary); }
@@ -107,13 +306,15 @@
         .links a {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             padding: 10px 20px;
+            min-height: 44px;
             border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 500;
             text-decoration: none;
-            transition: all 0.2s;
+            transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
         }
 
         .links .btn-primary {
@@ -128,7 +329,7 @@
         }
 
         .links .btn-outline {
-            background: white;
+            background: var(--btn-outline-bg);
             color: var(--text);
             border: 1px solid var(--border);
         }
@@ -139,33 +340,80 @@
             transform: translateY(-1px);
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .links a:hover,
+            .method-card:hover,
+            .back-to-top:hover {
+                transform: none;
+            }
+        }
+
         /* Sections */
-        section {
+        main section {
             padding: 60px 0;
         }
 
-        section:nth-child(even) {
+        main > section:nth-child(odd) {
             background: var(--bg-alt);
         }
 
-        section h2 {
+        main section h2 {
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 24px;
             letter-spacing: -0.01em;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
 
-        section h2 .section-icon {
+        main section h2 .section-icon {
             color: var(--primary);
             margin-right: 8px;
         }
+
+        .subheading {
+            margin-top: 16px;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .subheading-spaced {
+            margin-top: 40px;
+        }
+
+        .muted-lead {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .mb-28 { margin-bottom: 28px; }
+
+        .mt-16 { margin-top: 16px; }
+
+        .mt-24 { margin-top: 24px; }
+
+        .mb-8 { margin-bottom: 8px; }
+
+        .mb-16 { margin-bottom: 16px; }
+
+        .mb-20 { margin-bottom: 20px; }
+
+        .font-weight-500 { font-weight: 500; }
 
         /* Abstract */
         .abstract-text {
             font-size: 1.05rem;
             line-height: 1.8;
-            color: #334155;
+            color: var(--abstract-text);
             text-align: justify;
+        }
+
+        @media (max-width: 480px) {
+            .abstract-text {
+                text-align: left;
+            }
         }
 
         /* Method */
@@ -176,6 +424,7 @@
 
         .method-figure img {
             max-width: 100%;
+            height: auto;
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
         }
@@ -193,12 +442,28 @@
             margin-top: 32px;
         }
 
+        .method-cards--1 {
+            grid-template-columns: 1fr;
+        }
+
+        .method-cards--2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .method-cards--flush-top {
+            margin-top: 0;
+        }
+
+        .method-cards--mb-32 {
+            margin-bottom: 32px;
+        }
+
         .method-card {
-            background: white;
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 24px;
-            transition: all 0.2s;
+            transition: box-shadow 0.2s, transform 0.2s;
         }
 
         .method-card:hover {
@@ -223,6 +488,36 @@
             line-height: 1.6;
         }
 
+        .method-card img.card-inline-img {
+            width: 100%;
+            margin-top: 12px;
+            border-radius: 8px;
+            height: auto;
+        }
+
+        .method-card-split {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .method-card-split__media {
+            flex: 0 0 55%;
+            min-width: 0;
+        }
+
+        .method-card-split__media img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .method-card-split__body {
+            flex: 1;
+            min-width: 0;
+        }
+
         /* Results */
         .results-grid {
             display: grid;
@@ -230,11 +525,19 @@
             gap: 24px;
         }
 
+        .results-grid--full-row {
+            margin-top: 24px;
+        }
+
         .result-block {
-            background: white;
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             overflow: hidden;
+        }
+
+        .result-block--span {
+            grid-column: 1 / -1;
         }
 
         .result-block h3 {
@@ -243,6 +546,16 @@
             padding: 16px 20px;
             background: var(--bg-alt);
             border-bottom: 1px solid var(--border);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
+        }
+
+        .table-wrap--wide table {
+            min-width: 720px;
         }
 
         table {
@@ -274,32 +587,55 @@
         }
 
         tr.ours {
-            background: #eff6ff;
+            background: var(--ours-bg);
             font-weight: 600;
         }
 
         tr.ours td:first-child {
-            color: var(--primary);
+            color: var(--ours-text);
         }
 
         .highlight-note {
             margin-top: 24px;
             padding: 16px 20px;
-            background: #fefce8;
-            border-left: 4px solid var(--accent);
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
             border-radius: 0 var(--radius) var(--radius) 0;
             font-size: 0.92rem;
-            color: #713f12;
+            color: var(--highlight-text);
         }
 
-        /* Teaser / Qualitative */
+        /* Qualitative */
+        .qual-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .spatial-pair {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .spatial-pair .teaser-figure {
+            flex: 1;
+            margin: 0;
+        }
+
         .teaser-figure {
             text-align: center;
             margin: 24px 0;
         }
 
+        .teaser-figure--tight {
+            margin: 24px 0;
+        }
+
         .teaser-figure img {
             max-width: 100%;
+            height: auto;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
         }
@@ -355,12 +691,13 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #e2e8f0;
-            padding: 6px 12px;
+            padding: 8px 14px;
+            min-height: 36px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
             font-family: 'Inter', sans-serif;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
 
         .copy-btn:hover {
@@ -371,6 +708,7 @@
         footer {
             text-align: center;
             padding: 40px 0;
+            padding-bottom: max(40px, env(safe-area-inset-bottom));
             border-top: 1px solid var(--border);
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -381,20 +719,75 @@
             text-decoration: none;
         }
 
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .inline-link {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .method-cards { grid-template-columns: 1fr; }
-            .results-grid { grid-template-columns: 1fr; }
-            .links { flex-direction: column; align-items: center; }
-            .method-card[style*="display: flex"] { flex-direction: column !important; }
-            .method-card[style*="display: flex"] > div:first-child { flex: 1 1 auto !important; }
+            .method-cards,
+            .method-cards--2 {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .qual-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .spatial-pair {
+                flex-direction: column;
+            }
+
+            .links {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .links a {
+                width: 100%;
+                max-width: 360px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .method-card-split {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .method-card-split__media {
+                flex: none;
+                width: 100%;
+            }
+
+            .code-block pre,
+            .bibtex-block pre {
+                font-size: 0.78rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main section {
+                padding: 44px 0;
+            }
+
+            main section h2 {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- Hero -->
 <header class="hero">
     <div class="container">
         <div class="venue">EMNLP 2025</div>
@@ -420,8 +813,25 @@
     </div>
 </header>
 
-<!-- Abstract -->
-<section>
+<nav class="toc-nav" aria-label="Page sections">
+    <div class="container">
+        <details class="toc-details" open>
+            <summary class="toc-summary">On this page</summary>
+            <ul class="toc-list">
+                <li><a href="#abstract">Abstract</a></li>
+                <li><a href="#motivation">Motivation</a></li>
+                <li><a href="#method">Method</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#qualitative">Qualitative</a></li>
+                <li><a href="#code">Code</a></li>
+                <li><a href="#bibtex">BibTeX</a></li>
+            </ul>
+        </details>
+    </div>
+</nav>
+
+<main>
+<section id="abstract">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-scroll"></i></span>Abstract</h2>
         <p class="abstract-text">
@@ -430,77 +840,77 @@
     </div>
 </section>
 
-<!-- Motivation -->
-<section>
+<section id="motivation">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-lightbulb"></i></span>Motivation: Challenges in Image-to-Video Adaptation</h2>
 
-        <p class="abstract-text" style="margin-bottom: 28px;">
+        <p class="abstract-text mb-28">
             Adapting image-pretrained VLMs to video requires effective token compression and comprehensive understanding of the resulting representations. However, the <strong>perception bottleneck</strong> hinders efficient compression with minimal information loss, while <strong>token overload</strong> limits comprehensive interpretation of the compressed tokens, as their number still exceeds the capacity of image-pretrained VLMs.
         </p>
 
-        <div class="method-cards" style="grid-template-columns: 1fr; max-width: 100%; margin-top: 0; margin-bottom: 32px;">
-            <div class="method-card" style="display: flex; align-items: center; gap: 24px;">
-                <div style="flex: 0 0 55%;"><img src="static/teaser.png" alt="Perception bottleneck and token overload challenges" style="width:100%; border-radius:8px;"></div>
-                <div style="flex: 1;">
+        <div class="method-cards method-cards--1 method-cards--flush-top method-cards--mb-32">
+            <div class="method-card method-card-split">
+                <div class="method-card-split__media">
+                    <img src="static/teaser.png" alt="Perception bottleneck and token overload challenges" width="1621" height="1255" fetchpriority="high" loading="eager" decoding="async">
+                </div>
+                <div class="method-card-split__body">
                     <h3>Two Key Challenges</h3>
                     <p>We identify two key challenges in extending image-based VLMs to the video domain: <strong>Perception Bottleneck</strong> — static compression (uniform sampling, average pooling) treats all content uniformly, discarding informative cues that are dynamically distributed across temporal and spatial dimensions; <strong>Token Overload</strong> — even after compression, the number of visual tokens still far exceeds image-model capacity, causing performance saturation as the model cannot effectively interpret the excess information.</p>
                 </div>
             </div>
         </div>
 
-        <div class="method-cards" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="method-cards method-cards--2 method-cards--flush-top">
             <div class="method-card">
                 <h3>Perception Bottleneck</h3>
                 <p>Static compression strategies such as uniform frame sampling and spatial average pooling lack semantic adaptivity and tend to discard informative cues that are unevenly distributed across temporal and spatial dimensions. As shown below, static methods lead to notable performance degradation, while our <strong>dynamic compression</strong> alleviates this drop and even surpasses the uncompressed baseline.</p>
-                <img src="static/def_perception_bottleneck.png" alt="Perception bottleneck experiment" style="width:100%; margin-top:12px; border-radius:8px;">
+                <img class="card-inline-img" src="static/def_perception_bottleneck.png" alt="Perception bottleneck experiment" width="3198" height="1265" loading="lazy" decoding="async">
             </div>
             <div class="method-card">
                 <h3>Token Overload</h3>
                 <p>Even after compression, video inputs contain substantially more visual tokens than static images, exceeding the capacity of image-pretrained VLMs. The vanilla model exhibits a performance plateau as the token count increases. In contrast, <strong>question decomposition</strong> consistently outperforms the baseline with a widening accuracy gap, demonstrating superior scalability.</p>
-                <img src="static/def_token_overload.png" alt="Token overload experiment" style="width:100%; margin-top:12px; border-radius:8px;">
+                <img class="card-inline-img" src="static/def_token_overload.png" alt="Token overload experiment" width="2784" height="1134" loading="lazy" decoding="async">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Method -->
-<section>
+<section id="method">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-diagram-project"></i></span>Method</h2>
 
-        <p class="abstract-text" style="margin-bottom: 28px;">
+        <p class="abstract-text mb-28">
             To tackle these challenges, we introduce <strong>D-CoDe</strong>, a training-free framework that scales image-pretrained VLMs to video by integrating dynamic compression and question decomposition. Dynamic compression augments uniform sampling with supplementary frames and filters uninformative spatial tokens, while question decomposition reformulates complex queries into focused sub-questions for comprehensive understanding.
         </p>
 
         <div class="method-figure">
-            <img src="static/pipeline.png" alt="D-CoDe Framework Pipeline">
+            <img src="static/pipeline.png" alt="D-CoDe Framework Pipeline" width="10024" height="3720" loading="lazy" decoding="async">
             <p class="caption">Overview of the D-CoDe framework. Dynamic compression adaptively selects representative frames and aggregates spatial tokens, while question decomposition reformulates the query into sub-questions for more comprehensive video understanding.</p>
         </div>
 
-        <div class="method-cards" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="method-cards method-cards--2 method-cards--flush-top">
             <div class="method-card">
                 <h3>Supplementary Frame Selection</h3>
                 <p>Two-stage temporal compression: uniformly sample &lfloor;&alpha;&middot;N&rfloor; frames, then iteratively select supplementary frames with maximum semantic diversity using CLIP global features.</p>
-                <img src="static/frame_selection.png" alt="Supplementary Frame Selection" style="width:100%; margin-top:12px; border-radius:8px;">
+                <img class="card-inline-img" src="static/frame_selection.png" alt="Supplementary Frame Selection" width="1767" height="1346" loading="lazy" decoding="async">
             </div>
             <div class="method-card">
                 <h3>Spatial Token Pruning &amp; Merging</h3>
                 <p>Prune low-activation tokens by &ell;<sub>2</sub> norm, then greedily merge semantically similar tokens (cosine similarity &gt; &tau;) to reduce spatial redundancy while preserving informative content.</p>
-                <img src="static/token_pruning_merging.png" alt="Spatial Token Pruning and Merging" style="width:100%; margin-top:12px; border-radius:8px;">
+                <img class="card-inline-img" src="static/token_pruning_merging.png" alt="Spatial Token Pruning and Merging" width="1784" height="1109" loading="lazy" decoding="async">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Results -->
-<section>
+<section id="results">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-chart-line"></i></span>Results</h2>
 
         <div class="results-grid">
             <div class="result-block">
                 <h3>Multiple-Choice VideoQA &uarr;</h3>
+                <div class="table-wrap">
                 <table>
                     <thead><tr><th>Method</th><th>NExT-QA</th><th>EgoSchema</th><th>IntentQA</th></tr></thead>
                     <tbody>
@@ -510,10 +920,12 @@
                         <tr class="ours"><td>D-CoDe</td><td><strong>68.3</strong></td><td><strong>58.0</strong></td><td><strong>64.2</strong></td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="result-block">
                 <h3>Open-Ended VideoQA — Accuracy &uarr;</h3>
+                <div class="table-wrap">
                 <table>
                     <thead><tr><th>Method</th><th>MSVD</th><th>MSRVTT</th><th>TGIF</th><th>ANet</th></tr></thead>
                     <tbody>
@@ -523,12 +935,14 @@
                         <tr class="ours"><td>D-CoDe</td><td><strong>80.0</strong></td><td>64.2</td><td><strong>79.1</strong></td><td>56.4</td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
-        <div class="results-grid" style="margin-top: 24px;">
-            <div class="result-block" style="grid-column: 1 / -1;">
+        <div class="results-grid results-grid--full-row">
+            <div class="result-block result-block--span">
                 <h3>Full Comparison — All Methods (7B LLM, CLIP-L Visual Encoder)</h3>
+                <div class="table-wrap table-wrap--wide">
                 <table class="table-wide">
                     <thead>
                         <tr><th>Method</th><th>Type</th><th>NExT-QA</th><th>EgoSchema</th><th>IntentQA</th><th>MSVD</th><th>MSRVTT</th><th>TGIF</th><th>ANet</th></tr>
@@ -545,12 +959,14 @@
                         <tr class="ours"><td>D-CoDe (Ours)</td><td>free</td><td><strong>68.3</strong></td><td><strong>58.0</strong></td><td><strong>64.2</strong></td><td><strong>80.0</strong></td><td>64.2</td><td><strong>79.1</strong></td><td>56.4</td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
-        <div class="results-grid" style="margin-top: 24px;">
+        <div class="results-grid results-grid--full-row">
             <div class="result-block">
                 <h3>Module Ablation (EgoSchema) &uarr;</h3>
+                <div class="table-wrap">
                 <table>
                     <thead><tr><th>Module</th><th>Acc. (%)</th></tr></thead>
                     <tbody>
@@ -560,10 +976,12 @@
                         <tr class="ours"><td>+ Question Decomposition</td><td><strong>58.0</strong></td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="result-block">
                 <h3>Efficiency Analysis (EgoSchema)</h3>
+                <div class="table-wrap">
                 <table>
                     <thead><tr><th>Module</th><th>Acc. (%)</th><th>s/sample</th></tr></thead>
                     <tbody>
@@ -572,6 +990,7 @@
                         <tr class="ours"><td>+ Question Decomposition</td><td><strong>58.0</strong></td><td>37.40</td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
@@ -581,61 +1000,59 @@
     </div>
 </section>
 
-<!-- Qualitative Examples -->
-<section>
+<section id="qualitative">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-images"></i></span>Qualitative Examples</h2>
 
-        <h3 style="margin-top: 16px; margin-bottom: 12px;">Temporal Compression Visualization</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        <h3 class="subheading">Temporal Compression Visualization</h3>
+        <p class="muted-lead">
             Yellow frames are uniformly sampled; green frames are supplementary selections that maximize semantic diversity, capturing key moments missed by uniform sampling.
         </p>
-        <div class="teaser-figure" style="margin: 24px 0;">
-            <img src="static/vis_temporal.png" alt="Temporal compression visualization" style="width: 100%; max-width: none;">
+        <div class="teaser-figure teaser-figure--tight">
+            <img src="static/vis_temporal.png" alt="Temporal compression visualization" width="2550" height="1063" loading="lazy" decoding="async">
             <p class="caption">Supplementary frame selection enhances temporal diversity by selecting frames with maximum semantic difference from uniformly sampled frames.</p>
         </div>
 
-        <h3 style="margin-top: 40px; margin-bottom: 12px;">Spatial Compression Visualization</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        <h3 class="subheading subheading-spaced">Spatial Compression Visualization</h3>
+        <p class="muted-lead">
             Low-activation tokens (background regions) are pruned, and semantically similar remaining tokens are merged into clusters.
         </p>
-        <div style="display: flex; gap: 16px; align-items: start;">
-            <div class="teaser-figure" style="flex: 1; margin: 0;">
-                <img src="static/vis_spatial_1.png" alt="Spatial compression example 1" style="width: 100%;">
+        <div class="spatial-pair">
+            <div class="teaser-figure">
+                <img src="static/vis_spatial_1.png" alt="Spatial compression example 1" width="988" height="996" loading="lazy" decoding="async">
                 <p class="caption">Spatial token pruning &amp; merging — Example 1</p>
             </div>
-            <div class="teaser-figure" style="flex: 1; margin: 0;">
-                <img src="static/vis_spatial_2.png" alt="Spatial compression example 2" style="width: 100%;">
+            <div class="teaser-figure">
+                <img src="static/vis_spatial_2.png" alt="Spatial compression example 2" width="996" height="996" loading="lazy" decoding="async">
                 <p class="caption">Spatial token pruning &amp; merging — Example 2</p>
             </div>
         </div>
 
-        <h3 style="margin-top: 40px; margin-bottom: 12px;">Attention Visualization</h3>
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        <h3 class="subheading subheading-spaced">Attention Visualization</h3>
+        <p class="muted-lead">
             Question decomposition guides the model to attend to different aspects of the video. Each sub-question shifts the attention distribution to focus on distinct temporal regions.
         </p>
-        <div class="results-grid" style="grid-template-columns: repeat(3, 1fr); align-items: start;">
+        <div class="qual-grid">
             <div class="teaser-figure">
-                <img src="static/att_baseline.png" alt="Attention: original question">
+                <img src="static/att_baseline.png" alt="Attention: original question" width="1692" height="517" loading="lazy" decoding="async">
                 <p class="caption">Original question</p>
             </div>
             <div class="teaser-figure">
-                <img src="static/att_sub1.png" alt="Attention: sub-question 1">
+                <img src="static/att_sub1.png" alt="Attention: sub-question 1" width="1692" height="521" loading="lazy" decoding="async">
                 <p class="caption">Sub-question 1</p>
             </div>
             <div class="teaser-figure">
-                <img src="static/att_sub2.png" alt="Attention: sub-question 2">
+                <img src="static/att_sub2.png" alt="Attention: sub-question 2" width="1692" height="505" loading="lazy" decoding="async">
                 <p class="caption">Sub-question 2</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Code -->
-<section>
+<section id="code">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-code"></i></span>Code</h2>
-        <p style="margin-bottom: 16px;">D-CoDe provides three modular functions that can be used independently or combined:</p>
+        <p class="mb-16">D-CoDe provides three modular functions that can be used independently or combined:</p>
 
         <div class="code-block">
 <pre><span class="keyword">from</span> Dcode <span class="keyword">import</span> generate_subquestions, supp_frame_selection, token_select_and_merge, load_clip_model
@@ -665,21 +1082,20 @@ merged_features = <span class="func">token_select_and_merge</span>(
 )</pre>
         </div>
 
-        <p style="margin-top: 16px;">
-            See the <a href="https://github.com/hukcc/D-CoDe" style="color: var(--primary); font-weight: 500;">GitHub repository</a> for full installation instructions, data preparation, and evaluation scripts.
+        <p class="mt-16">
+            See the <a href="https://github.com/hukcc/D-CoDe" class="inline-link">GitHub repository</a> for full installation instructions, data preparation, and evaluation scripts.
         </p>
     </div>
 </section>
 
-<!-- BibTeX -->
-<section>
+<section id="bibtex">
     <div class="container">
         <h2><span class="section-icon"><i class="fa-solid fa-quote-left"></i></span>BibTeX</h2>
-        <p style="margin-bottom: 16px;">If you find this work useful, please cite our paper:</p>
+        <p class="mb-16">If you find this work useful, please cite our paper:</p>
 
-        <p style="margin-bottom: 8px; font-weight: 500;">EMNLP version:</p>
-        <div class="bibtex-block" style="margin-bottom: 20px;">
-            <button class="copy-btn" onclick="copyBibtex('bibtex-emnlp')"><i class="fa-regular fa-copy"></i> Copy</button>
+        <p class="mb-8 font-weight-500">EMNLP version:</p>
+        <div class="bibtex-block mb-20">
+            <button type="button" class="copy-btn" onclick="copyBibtex('bibtex-emnlp')"><i class="fa-regular fa-copy"></i> Copy</button>
 <pre id="bibtex-emnlp">@inproceedings{huang-etal-2025-code,
     title = "{D}-{C}o{D}e: Scaling Image-Pretrained {VLM}s to Video via Dynamic Compression and Question Decomposition",
     author = "Huang, Yiyang  and
@@ -691,9 +1107,9 @@ merged_features = <span class="func">token_select_and_merge</span>(
 }</pre>
         </div>
 
-        <p style="margin-bottom: 8px; font-weight: 500;">arXiv version:</p>
+        <p class="mb-8 font-weight-500">arXiv version:</p>
         <div class="bibtex-block">
-            <button class="copy-btn" onclick="copyBibtex('bibtex-arxiv')"><i class="fa-regular fa-copy"></i> Copy</button>
+            <button type="button" class="copy-btn" onclick="copyBibtex('bibtex-arxiv')"><i class="fa-regular fa-copy"></i> Copy</button>
 <pre id="bibtex-arxiv">@article{huang2025d,
     title={D-CoDe: Scaling Image-Pretrained VLMs to Video via Dynamic Compression and Question Decomposition},
     author={Huang, Yiyang and Wang, Yizhou and Fu, Yun},
@@ -703,6 +1119,7 @@ merged_features = <span class="func">token_select_and_merge</span>(
         </div>
     </div>
 </section>
+</main>
 
 <footer>
     <div class="container">
@@ -710,17 +1127,34 @@ merged_features = <span class="func">token_select_and_merge</span>(
     </div>
 </footer>
 
+<a href="#top" class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
+
 <script>
 function copyBibtex(id) {
-    const text = document.getElementById(id).textContent;
-    const btn = document.getElementById(id).parentElement.querySelector('.copy-btn');
-    navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById(id);
+    const text = el.textContent;
+    const btn = el.parentElement.querySelector('.copy-btn');
+    navigator.clipboard.writeText(text).then(function () {
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-        setTimeout(() => {
+        setTimeout(function () {
             btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
         }, 2000);
     });
 }
+
+(function () {
+    var btn = document.getElementById('back-to-top');
+    if (!btn) return;
+    function onScroll() {
+        btn.classList.toggle('visible', window.scrollY > 400);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+})();
 </script>
 
 </body>
